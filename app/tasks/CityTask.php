@@ -6,6 +6,7 @@ class CityTask extends Task
 {
     public function mainAction()
     {
+
         try {
             $this->db->begin();
             $cityCollection = $this->getDI()->get('config')->params->available_cities;

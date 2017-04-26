@@ -82,6 +82,8 @@ class ToolsHelper
 
     public static function generateSlug($text)
     {
+        $locales = \Phalcon\Di::getDefault()->get('config')->params->locales;
+
         $countryCharReplacements = array(
             'lt' => array(
                 'ą' => 'a',
@@ -161,9 +163,9 @@ class ToolsHelper
         $text = strtr($text, $removableChars);
         $text = preg_replace('#\s+#u', '-', $text);
         $text = preg_replace('~-{2,}~', '-', $text);
-        $text = strtr(mb_strtolower($text, 'utf-8'), $countryCharReplacements['ee']);
-        $text = strtr(mb_strtolower($text, 'utf-8'), $countryCharReplacements['ru']);
-        $text = strtr(mb_strtolower($text, 'utf-8'), $countryCharReplacements['lv']);
+        foreach ($locales as $locale) {
+            $text = strtr(mb_strtolower($text, 'utf-8'), $countryCharReplacements[$locale]);
+        }
         $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 
         return $text;
