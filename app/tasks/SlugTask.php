@@ -6,15 +6,15 @@ class SlugTask extends Task
 {
     public function mainAction($locale)
     {
-        $locale = $locale[0];
+        $locale = (isset($locale[0]) ? $locale[0] : $this->getDI()->get('config')->params->locale);
         $localeCollection = $this->getDI()->get('config')->params->locales->toArray();
-
 
         if (!in_array($locale, $localeCollection)) {
             exit ("Locale doesn't exist" . PHP_EOL);
         }
 
         $executedSave = $executedUpdate = 0;
+
         $entityTypeCollection = [
             'city' => [
                 'field' => 'slug',
