@@ -45,22 +45,29 @@ class SlugTask extends Task
 
         if ($locale == $this->getDI()->get('config')->params->locale) {
             foreach ($slugCollection as $slug) {
+
+                $slugName = ToolsHelper::generateSlug($slug->name);
+
                 $entity = $entityTypeCollection[$slug->type]['entity'];
                 $entity = $entity::findFirst($slug->item_id);
                 $setter = 'set' . ucfirst($entityTypeCollection[$slug->type]['field']);
                 $getter = 'get' . ucfirst($entityTypeCollection[$slug->type]['field']);
 
+
                 if (is_object($entity)) {
-                    if ($entity->{$getter}() != $slug->name AND $entity->{$getter}() == NULL) {
-                        $entity->{$setter}($slug->name);
+                    if ($entity->{$getter}() != $slugName AND $entity->{$getter}() == NULL) {
+                        $entity->{$setter}($slugName);
                         $entity->save();
                         $executedSave++;
                     }
                 }
             }
         } else {
+
             foreach ($slugCollection as $slug) {
                 $localization = new Localization();
+
+                $slugName = ToolsHelper::generateSlug($slug->name);
 
                 $entity = $entityTypeCollection[$slug->type]['entity'];
                 $entity = $entity::findFirst($slug->item_id);
@@ -71,20 +78,21 @@ class SlugTask extends Task
                     $localization->setSource($entity->LOCALIZED_TABLE);
                     $isLocalized = $this->db->query('Select id,content FROM ' . $entity->LOCALIZED_TABLE . '  WHERE object_id = :objectId AND locale = :locale AND field = "slug"', ['objectId' => $entity->id, 'locale' => $locale])->fetch() ;
 
-                    if ($isLocalized && $isLocalized['content'] != $slug->name) {
+                    if ($isLocalized ) {
+
                         try {
                             $this->db->query('UPDATE '. $entity->LOCALIZED_TABLE .' set content = :content WHERE id = :id', [
-                                'content' => $slug->name,
+                                'content' => $slugName,
                                 'id' => $isLocalized['id']
                             ])->execute();
 
                         } catch (Exception $e)
                         {
-                            echo 'Updating error: ' . $e->getMessage(). PHP_EOL;
+                            echo 'Updating error: ' . $e->getMessage(). PHP_EOL; exit;
                         } finally { $executedUpdate++; }
                     } elseif (!$isLocalized) {
                         $localization->id = null;
-                        $localization->setContent($slug->name);
+                        $localization->setContent($slugName);
                         $localization->setField($entityTypeCollection[$slug->type]['field']);
                         $localization->setLocale($locale);
                         $localization->setObjectId($slug->item_id);
@@ -92,7 +100,7 @@ class SlugTask extends Task
                             $localization->save();
                         } catch (Exception $e)
                         {
-                            echo 'Saving error: ' . $e->getMessage(). PHP_EOL;
+                            echo 'Saving error: ' . $e->getMessage(). PHP_EOL; exit;
                         } finally { $executedSave++; }
                     }
                 }

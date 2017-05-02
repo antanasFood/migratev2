@@ -14,7 +14,7 @@ return new \Phalcon\Config([
         'host'        => 'localhost',
         'username'    => 'root',
         'password'    => 'food',
-        'dbname'      => 'food_dev_lt',
+        'dbname'      => 'food_dev_lv_4export',
         'charset'     => 'utf8',
     ],
 //    'database2' => [
@@ -40,11 +40,11 @@ return new \Phalcon\Config([
     ],
     'params' =>
     [
-        'locale'    => 'lt',
-        'locales' => ["lt", "en", "ru"],
-        'available_cities' => ["Vilnius", "Kaunas", "Klaipėda"],
-        'available_cities_slugs' => ["Vilnius", "Kaunas", "Klaipeda"],
-        'country' => 'lt',
+        'locale'    => 'lv',
+        'locales' => ["lv", "en", "ru"],
+        'available_cities' => ["Rīga", "Ogre", "Jurmala", "Jelgava"],
+        'available_cities_slugs' => ["Riga", "Ogre", "Jurmala", "Jelgava"],
+        'country' => 'lv',
 
     ]
 ]);

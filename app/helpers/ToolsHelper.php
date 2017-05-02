@@ -112,7 +112,11 @@ class ToolsHelper
             'lv' => array ( /* Latvian */
                 'ā' => 'a', 'č' => 'c', 'ē' => 'e', 'ģ' => 'g', 'ī' => 'i', 'ķ' => 'k', 'ļ' => 'l', 'ņ' => 'n',
                 'š' => 's', 'ū' => 'u', 'ž' => 'z', 'Ā' => 'A', 'Č' => 'C', 'Ē' => 'E', 'Ģ' => 'G', 'Ī' => 'i',
-                'Ķ' => 'k', 'Ļ' => 'L', 'Ņ' => 'N', 'Š' => 'S', 'Ū' => 'u', 'Ž' => 'Z'
+                'Ķ' => 'k', 'Ļ' => 'L', 'Ņ' => 'N', 'Š' => 'S', 'Ū' => 'u', 'Ž' => 'Z',                 'ą' => 'a',
+                'ę' => 'e',
+                'ė' => 'e',
+                'į' => 'i',
+                'ų' => 'u',
             ),
             'ee' => array (
                 'Š' => 'S', 'Ž' => 'Z', 'Õ' => 'O', 'Ä' => 'A', 'Ö' => 'O', 'Ü' => 'U',
@@ -165,7 +169,9 @@ class ToolsHelper
         $text = preg_replace('~-{2,}~', '-', $text);
         foreach ($locales as $locale) {
             $text = strtr(mb_strtolower($text, 'utf-8'), $countryCharReplacements[$locale]);
+
         }
+
         $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 
         return $text;
