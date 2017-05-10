@@ -104,4 +104,28 @@ EOT
         }
     }
 
+    public function pageParamsAction()
+    {
+        $di = $this->getDI();
+        $pageCollection = StaticContent::find();
+        try {
+            $this->db->begin();
+            foreach ($pageCollection as $page)
+            {
+                if (strpos($page->content, "{{ faq_video }}") !== false) {
+                    $video = '<iframe width="560" height="315" src="' . $di->get('config')->params->yt_embeded . '" frameborder="0" allowfullscreen></iframe>';
+                    $cont = $page->content;
+                    $page->content = str_replace("{{ faq_video }}", $video, $cont);
+                    $page->update();
+                }
+            }
+            $this->db->commit();
+        } catch (\Exception $e)
+        {
+            echo $e->getMessage() . PHP_EOL; exit;
+        }
+
+        echo 'Pages updated.' . PHP_EOL;
+    }
+
 }

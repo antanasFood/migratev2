@@ -35,6 +35,10 @@ class SlugTask extends Task
             'kitchen' => [
                 'field' => 'slug',
                 'entity' => Kitchen::class,
+            ],
+            'dish' => [
+                'field' => 'slug',
+                'entity' => Dish::class,
             ]
         ];
 

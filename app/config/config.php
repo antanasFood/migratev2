@@ -14,7 +14,7 @@ return new \Phalcon\Config([
         'host'        => 'localhost',
         'username'    => 'root',
         'password'    => 'food',
-        'dbname'      => 'food_dev_lv_4export',
+        'dbname'      => 'food_prod_lv',
         'charset'     => 'utf8',
     ],
 //    'database2' => [
@@ -45,6 +45,7 @@ return new \Phalcon\Config([
         'available_cities' => ["Rīga", "Ogre", "Jurmala", "Jelgava"],
         'available_cities_slugs' => ["Riga", "Ogre", "Jurmala", "Jelgava"],
         'country' => 'lv',
+        'yt_embeded' => '//www.youtube-nocookie.com/embed/D-EkSle0r84'
 
     ]
 ]);
