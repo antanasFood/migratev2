@@ -16,7 +16,7 @@ class ToolsHelper
         foreach (\Phalcon\Di::getDefault()->get('config')->params->locales as $locale) {
             foreach ($createdObj->LOCALIZED_FIELD as $lField) {
                 $modelLocalized = new Localization();
-
+                $modelLocalized->setSource($createdObj->LOCALIZED_TABLE);
                 if ($lField[0] == '~') {
                     $lField = str_replace('~', '', $lField);
                     if (null == $createdObj->getSlugType()) {
@@ -30,6 +30,7 @@ class ToolsHelper
                     $modelLocalized->locale = $locale;
                     $modelLocalized->field = $lField;
                     $modelLocalized->content = $createdObj->{$lField};
+
                     if ($modelLocalized->create()){
                         $status = true;
                     }

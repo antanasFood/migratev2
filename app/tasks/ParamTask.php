@@ -5,6 +5,9 @@ use Phalcon\Cli\Task;
 class ParamTask extends Task
 {
 
+
+
+
     private $footerScripts = [
         'lt' =>
             <<<'EOT'
@@ -53,15 +56,162 @@ EOT
 
     ];
 
+    /**
+     * Naujas uzsakymas. Dar neperduotas restoranui
+     * @var string
+     */
+    public static $status_new = "new";
+    /**
+     * @var string Nepavyko apmokejimas
+     */
+    public static $status_failed = "failed";
+    public static $status_accepted = "accepted";
+    public static $status_assiged = "assigned";
+    public static $status_delayed = "delayed";
+    public static $status_forwarded = "forwarded";
+    public static $status_completed = "completed";
+    public static $status_finished = "finished";
+    public static $status_canceled = "canceled";
+    public static $status_canceled_produced = "canceled_produced";
+
+    /**
+     * Nemaisyti su pre.. cia orderis laikui
+     * @var string
+     */
+    public static $status_preorder = "preorder";
+    public static $status_pre = "pre";
+    public static $status_unapproved = "unapproved";
+    public static $status_nav_problems = "nav_problems";
+    public static $status_partialy_completed = "partialy_completed";
+
+    public static $type_pickup = 'pickup';
+    public static $type_simple = 'order';
+
+    const SOURCE_NAV = "nav";
+    const SOURCE_APIV1 = "apiv1";
+    const SOURCE_APIV2 = "apiv2";
+    const SOURCE_FOODOUT = "foodout";
+
+    private $messages = [
+        'lv' => [
+            'sms' =>
+                [
+                    'order_created' => 'Sveiki. Foodout.lv sanema Tavu pasutijumu Nr. order_id. Rupesimies par ta piegadi delivery_time laika! :)',
+                    'order_created_pickup' => 'Sveiki. restaurant_name sanema Tavu pasutijumu. Panemt to varesi pre_delivery_time! :)',
+                    'order_created_preorder' => 'Sveiki. Pasutijums Nr. order_id ir pienemts. Tas tiks piegadats pre_delivery_time! Tavs Foodout.lv :)',
+                    'order_created_preorder_pickup' => 'Sveiki. restaurant_name sanema Tavu pasutijumu. Panemt to varesi pre_delivery_time! :)',
+                    'order_accepted_preorder' => 'Sveiki. restaurant_name sanema Tavu pasutijumu. Tas tiks piegadats pre_delivery_time! Tavs Foodout.lv :)',
+                    'order_accepted_preorder_pickup' => 'Sveiki. Savu pasutijumu varesi sanemt pre_delivery_time! Tavs Foodout.lv',
+                    'order_delayed' => 'Atvaino, sakara ar lielo restorana noslodzi, pasutijums kavesies delay_time. Pasutijuma Nr. order_id. :(',
+                    'order_delayed_pickup' => 'Atvaino, sakara ar lielo restorana noslodzi, pasutijums kavesies delay_time. Pasutijuma Nr. order_id. :(',
+                    'order_completed' => 'Paldies par pasutijumu. Ielade Foodout mobilo aplikaciju un sanem labakos piedavajumus: http://bit.ly/2nM2ORF',
+                ]
+        ]
+    ];
+
+    private $replace = [
+        'search'    => ['order_id', 'restaurant_name', 'delivery_time', 'pre_delivery_time'],
+        'replace'   => ['[order_id]', '[restaurant_name]', '[delivery_time]', '[pre_delivery_time]']
+    ];
+
+    public function smsAction()
+    {
+        try {
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created']);
+            $obj->status = self::$status_new;
+            $obj->preorder = false;
+            $obj->type = self::$type_simple;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_pickup']);
+            $obj->status = self::$status_new;
+            $obj->preorder = false;
+            $obj->type = self::$type_pickup;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_preorder']);
+            $obj->status = self::$status_new;
+            $obj->preorder = true;
+            $obj->type = self::$type_simple;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_preorder_pickup']);
+            $obj->status = self::$status_new;
+            $obj->preorder = true;
+            $obj->type = self::$type_pickup;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder']);
+            $obj->status = self::$status_accepted;
+            $obj->preorder = false;
+            $obj->type = self::$type_simple;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder_pickup']);
+            $obj->status = self::$status_accepted;
+            $obj->preorder = true;
+            $obj->type = self::$type_pickup;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_delayed']);
+            $obj->status = self::$status_delayed;
+            $obj->preorder = false;
+            $obj->type = self::$type_simple;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_delayed_pickup']);
+            $obj->status = self::$status_accepted;
+            $obj->preorder = false;
+            $obj->type = self::$type_pickup;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+            $obj = new SmsTemplate();
+            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_completed']);
+            $obj->status = self::$status_completed;
+            $obj->preorder = false;
+            $obj->type = self::$type_simple;
+            $obj->source = self::SOURCE_FOODOUT;
+            $obj->active = true;
+            $obj->create();
+
+
+        } catch (\Exception $e) {
+            $this->db->rollback();
+            echo $e->getMessage() . PHP_EOL;
+        }
+    }
+
     public function mainAction()
     {
-
-        $di = $this->getDI();
 
 
         try {
             $this->db->begin();
-            $country = $di->get('config')->params->country;
+            $country = $this->config->params->country;
 
             if ($this->footerScripts[$country]) {
                 $item = Params::findFirstByParam('footer_scripts');
@@ -106,26 +256,125 @@ EOT
 
     public function pageParamsAction()
     {
-        $di = $this->getDI();
+
         $pageCollection = StaticContent::find();
         try {
             $this->db->begin();
-            foreach ($pageCollection as $page)
-            {
+            foreach ($pageCollection as $page) {
                 if (strpos($page->content, "{{ faq_video }}") !== false) {
-                    $video = '<iframe width="560" height="315" src="' . $di->get('config')->params->yt_embeded . '" frameborder="0" allowfullscreen></iframe>';
+                    $video = '<iframe width="560" height="315" src="' . $this->config->params->yt_embeded . '" frameborder="0" allowfullscreen></iframe>';
                     $cont = $page->content;
                     $page->content = str_replace("{{ faq_video }}", $video, $cont);
                     $page->update();
                 }
             }
             $this->db->commit();
-        } catch (\Exception $e)
-        {
-            echo $e->getMessage() . PHP_EOL; exit;
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            exit;
         }
 
         echo 'Pages updated.' . PHP_EOL;
     }
+
+    public function mailAction()
+    {//Soriuką
+        try {
+            $this->db->begin();
+
+            $id = $this->config->params->mailer_notify_on_accept;
+
+            $mailTmpl = new EmailTemplate();
+            $mailTmpl->templateId = $id;
+            $mailTmpl->status = self::$status_accepted;
+            $mailTmpl->active = true;
+            $mailTmpl->preorder = false;
+            $mailTmpl->type = self::$type_simple;
+            $mailTmpl->source = true;
+            $mailTmpl->create();
+
+            $id = $this->config->params->mailer_notify_pickup_on_accept;
+            $mailTmpl = new EmailTemplate();
+            $mailTmpl->templateId = $id;
+            $mailTmpl->status = self::$status_accepted;
+            $mailTmpl->active = true;
+            $mailTmpl->preorder = false;
+            $mailTmpl->type = self::$type_pickup;
+            $mailTmpl->source = true;
+            $mailTmpl->create();
+//        $id = $this->config->params->mailer_notify_new_user;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+//
+//        $id = $this->config->params->mailer_user_reset;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+
+            $id = $this->config->params->mailer_partialy_deliverer;
+            $mailTmpl = new EmailTemplate();
+            $mailTmpl->templateId = $id;
+            $mailTmpl->status = self::$status_partialy_completed;
+            $mailTmpl->active = true;
+            $mailTmpl->preorder = false;
+            $mailTmpl->type = self::$type_simple;
+            $mailTmpl->source = true;
+            $mailTmpl->create();
+//        $id = $this->config->params->mailer_rate_your_food;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+
+//        $id = $this->config->params->mailer_send_invoice;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+
+//        $id = $this->config->params->mailer_send_corporate_invoice;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+//
+//        $id = $this->config->params->mailer_send_corporate_changed_password;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+//
+//        $id = $this->config->params->mailer_send_free_delivery_discount;
+//        $mailTmpl = new EmailTemplate();
+//        $mailTmpl->templateId = $id;
+//        $mailTmpl->active = true;
+//        $mailTmpl->preorder = true;
+//        $mailTmpl->type = self::$status_accepted;
+//        $mailTmpl->source = true;
+            $this->db->commit();
+            echo 'Mail templates created' . PHP_EOL;
+        } catch (\Exception $e) {
+            $this->db->rollback();
+            echo $e->getMessage() . PHP_EOL;
+        }
+    }
+
+
+
 
 }

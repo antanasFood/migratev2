@@ -17,11 +17,8 @@ class CityTask extends Task
                 $cityObj->active = 1;
                 $cityObj->title = $city;
 
-                try {
-                    $cityObj->create();
-                } catch (PDOException $e) {
-                    echo 'FAILED: ' . PHP_EOL . $e->getMessage() . PHP_EOL;
-                }
+                $cityObj->create();
+
 
 
                 $streetCollection = CityStreets::findByCity($city);
@@ -81,7 +78,7 @@ class CityTask extends Task
 
             echo 'Cities migrated'. PHP_EOL;
 
-        } catch (PDOException $e) {
+        } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
             $this->logger->debug($e->getTraceAsString());
             $this->db->rollback();

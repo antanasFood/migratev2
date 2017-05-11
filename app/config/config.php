@@ -45,7 +45,17 @@ return new \Phalcon\Config([
         'available_cities' => ["Rīga", "Ogre", "Jurmala", "Jelgava"],
         'available_cities_slugs' => ["Riga", "Ogre", "Jurmala", "Jelgava"],
         'country' => 'lv',
-        'yt_embeded' => '//www.youtube-nocookie.com/embed/D-EkSle0r84'
+        'yt_embeded' => '//www.youtube-nocookie.com/embed/D-EkSle0r84',
+        'mailer_notify_on_accept' => '30026333',
+        'mailer_notify_pickup_on_accept' => '41584575',
+        'mailer_notify_new_user' => '30026305',
+        'mailer_user_reset' => '30026299',
+        'mailer_partialy_deliverer' => '30021995',
+        'mailer_rate_your_food' => '30026301',
+        'mailer_send_invoice' => '30026291',
+        'mailer_send_corporate_invoice' => '41585359_to_change',
+        'mailer_send_corporate_changed_password' => '41611951',
+        'mailer_send_free_delivery_discount' => '41611739'
 
     ]
 ]);
