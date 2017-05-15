@@ -4,6 +4,7 @@ class StaticContent extends ModelFoodout
 {
 
     protected $LOCALIZED_TABLE = 'static_content_localized';
+    protected $LOCALIZED_FIELD = ['content','title','seo_title', 'seo_description', '~slug'];
 
     /**
      *

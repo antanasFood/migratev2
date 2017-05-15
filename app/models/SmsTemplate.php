@@ -64,13 +64,6 @@ class SmsTemplate extends ModelFoodout
      */
     public $deleted_at;
 
-    /**
-     * Initialize method for model.
-     */
-    public function initialize()
-    {
-        $this->setSchema("test");
-    }
 
     /**
      * Returns table name mapped in the model.
@@ -103,5 +96,22 @@ class SmsTemplate extends ModelFoodout
     {
         return parent::findFirst($parameters);
     }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
 
 }

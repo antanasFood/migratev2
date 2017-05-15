@@ -106,6 +106,20 @@ EOT
                     'order_delayed_pickup' => 'Atvaino, sakara ar lielo restorana noslodzi, pasutijums kavesies delay_time. Pasutijuma Nr. order_id. :(',
                     'order_completed' => 'Paldies par pasutijumu. Ielade Foodout mobilo aplikaciju un sanem labakos piedavajumus: http://bit.ly/2nM2ORF',
                 ]
+        ],
+        'lt' => [
+            'sms' =>
+                [
+                    'order_created' => 'Labas! Tavo uzsakymas nr. order_id priimtas. Pristatysime per ~delivery_time!',
+                    'order_created_pickup' => 'Labas! Tavo uzsakymas nr. order_id priimtas. Atsiimti galesite ~pre_delivery_time!',
+                    'order_created_preorder' => 'Labas! Tavo uzsakymas nr. order_id priimtas. Pristatysime ~pre_delivery_time!',
+                    'order_created_preorder_pickup' => 'Labas! Tavo uzsakymas nr. order_id priimtas. Atsiimti galesite ~pre_delivery_time!',
+                    'order_accepted_preorder' => 'restourant_name patvirtino Tavo uzsakyma nr. order_id. Pristatysime ~pre_delivery_time.!',
+                    'order_accepted_preorder_pickup' => 'restourant_name patvirtino Tavo uzsakyma nr. order_id. Atsiimti galesite ~pre_delivery_time.!',
+                    'order_delayed' => 'Atsiprasome - del didelio uzsakymu srauto delay_time min veluosime pristatyti tavo uzsakyma nr. order_id. :(',
+                    'order_delayed_pickup' => 'Atsiprasome - del didelio uzsakymu srauto delay_time min veluosime paruosti tavo uzsakyma nr. order_id. :(',
+                    'order_completed' => 'Aciu, kad esi kartu. Numalsink alki greiciau - uzsisakyk per mob. programele: https://bit.ly/2glLO66',
+                ]
         ]
     ];
 
@@ -114,11 +128,23 @@ EOT
         'replace'   => ['[order_id]', '[restaurant_name]', '[delivery_time]', '[pre_delivery_time]']
     ];
 
+    private  function replaceShortcode($txt)
+    {
+
+        foreach ($this->replace['search'] as $k=>$r) {
+            $txt =  preg_replace("/(\b($r)\b)/i",  $this->replace['replace'][$k] , $txt);
+        }
+
+        return $txt;
+    }
+
     public function smsAction()
     {
+
         try {
+            $this->db->begin();
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created']);
+            $obj->text = $this->replaceShortcode($this->messages[$this->config->params->locale]['sms']['order_created']);
             $obj->status = self::$status_new;
             $obj->preorder = false;
             $obj->type = self::$type_simple;
@@ -127,7 +153,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_pickup']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_created_pickup']);
             $obj->status = self::$status_new;
             $obj->preorder = false;
             $obj->type = self::$type_pickup;
@@ -136,7 +162,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_preorder']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_created_preorder']);
             $obj->status = self::$status_new;
             $obj->preorder = true;
             $obj->type = self::$type_simple;
@@ -145,7 +171,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_created_preorder_pickup']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_created_preorder_pickup']);
             $obj->status = self::$status_new;
             $obj->preorder = true;
             $obj->type = self::$type_pickup;
@@ -154,7 +180,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder']);
             $obj->status = self::$status_accepted;
             $obj->preorder = false;
             $obj->type = self::$type_simple;
@@ -163,7 +189,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder_pickup']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_accepted_preorder_pickup']);
             $obj->status = self::$status_accepted;
             $obj->preorder = true;
             $obj->type = self::$type_pickup;
@@ -172,7 +198,7 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_delayed']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_delayed']);
             $obj->status = self::$status_delayed;
             $obj->preorder = false;
             $obj->type = self::$type_simple;
@@ -181,8 +207,8 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_delayed_pickup']);
-            $obj->status = self::$status_accepted;
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_delayed_pickup']);
+            $obj->status = self::$status_delayed;
             $obj->preorder = false;
             $obj->type = self::$type_pickup;
             $obj->source = self::SOURCE_FOODOUT;
@@ -190,14 +216,14 @@ EOT
             $obj->create();
 
             $obj = new SmsTemplate();
-            $obj->text = str_replace($this->replace['search'], $this->replace['replace'], $this->messages[$this->config->params->locale]['sms']['order_completed']);
+            $obj->text = $this->replaceShortcode( $this->messages[$this->config->params->locale]['sms']['order_completed']);
             $obj->status = self::$status_completed;
             $obj->preorder = false;
             $obj->type = self::$type_simple;
             $obj->source = self::SOURCE_FOODOUT;
             $obj->active = true;
             $obj->create();
-
+            $this->db->commit();
 
         } catch (\Exception $e) {
             $this->db->rollback();
@@ -225,15 +251,6 @@ EOT
 
                 $item->save();
             }
-//
-//            $query = "INSERT INTO `common_slug_forward` (`id`, `slug`, `locale`, `controller`, `params`) VALUES
-//(1, '1822/cili-pica', 'lt', 'FoodDishesBundle:Place:index', \"{'id'':'63','slug':'cili-pica','categoryId':'','oldFriendIsHere':'1'}\"),
-//(2, '1822/cili-kaimas', 'lt', 'FoodDishesBundle:Place:index', \"'{'id':'67','slug':'cili-kaimas-kaunas','categoryId':'','oldFriendIsHere':'1'}\"),
-//(3, '1822/soya', 'lt', 'FoodDishesBundle:Place:index', \"{'id':'70','slug':'soya','categoryId':'','oldFriendIsHere':'1'}\")";
-
-//            if ($di->get('config')->params->country == 'lt') {
-//                $this->db->query($query)->execute();
-//            }
             foreach ($this->paramCollection as $paramName => $values) {
                 if (isset($values[$country])) {
                     $item = Params::findFirstByParam($paramName);
@@ -254,7 +271,7 @@ EOT
         }
     }
 
-    public function pageParamsAction()
+    public function pageAction()
     {
 
         $pageCollection = StaticContent::find();
@@ -273,6 +290,8 @@ EOT
             echo $e->getMessage() . PHP_EOL;
             exit;
         }
+
+
 
         echo 'Pages updated.' . PHP_EOL;
     }
